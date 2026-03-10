@@ -89,6 +89,20 @@ async function fetchContributions(login, token) {
   };
 }
 
+async function fetchOfficialContributionHtml(login) {
+  const response = await fetch(`https://github.com/users/${login}/contributions`, {
+    headers: {
+      "User-Agent": "horse-ucg",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub contributions page request failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.text();
+}
+
 async function main() {
   const token = resolveToken();
   if (!token) {
@@ -104,10 +118,14 @@ async function main() {
   }
 
   const data = await fetchContributions(username, token);
+  const officialHtml = await fetchOfficialContributionHtml(username);
   mkdirSync(outputDir, { recursive: true });
-  const outputPath = join(outputDir, `${username}-contributions.json`);
-  writeFileSync(outputPath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
-  console.log(`Wrote ${outputPath}`);
+  const jsonOutputPath = join(outputDir, `${username}-contributions.json`);
+  const htmlOutputPath = join(outputDir, `${username}-official-contributions.html`);
+  writeFileSync(jsonOutputPath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  writeFileSync(htmlOutputPath, officialHtml, "utf8");
+  console.log(`Wrote ${jsonOutputPath}`);
+  console.log(`Wrote ${htmlOutputPath}`);
 }
 
 main().catch((error) => {
