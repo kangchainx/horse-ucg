@@ -7,6 +7,7 @@
   --muted: #8b949e;
   --accent: #39d353;
   --gold: #f5d300;
+  --graph-card-height: 240px;
 }
 
 * {
@@ -16,45 +17,41 @@
 html,
 body,
 #root {
-  min-height: 100%;
+  min-height: 100vh;
 }
 
 body {
   margin: 0;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background:
     radial-gradient(circle at top, rgba(57, 211, 83, 0.1), transparent 25%),
     linear-gradient(180deg, #0d1117 0%, #0b1016 100%);
   color: var(--text);
 }
 
+#root {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .app-shell {
+  width: min(1000px, calc(100vw - 32px));
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 16px 28px;
+  justify-content: center;
+  padding: 20px 0;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-  z-index: 1;
-}
-
-.header h1 {
-  margin: 0 0 10px;
-  font-size: clamp(2.2rem, 6vw, 3.6rem);
-  background: linear-gradient(45deg, var(--accent), var(--gold));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.header p {
-  margin: 0;
-  color: var(--muted);
+.app-shell--compact {
+  justify-content: center;
 }
 
 .prototype-card {
@@ -91,27 +88,11 @@ canvas {
 .race-scene {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .race-scene--paused {
   opacity: 0.98;
-}
-
-.scene-track {
-  stroke: #30363d;
-  stroke-width: 2;
-}
-
-.scene-copy__title {
-  fill: #c9d1d9;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.scene-copy__subtitle {
-  fill: #8b949e;
-  font-size: 12px;
 }
 
 .month-labels text {
@@ -150,6 +131,396 @@ button:hover {
   transform: translateY(-1px);
 }
 
+.topbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.user-picker {
+  width: min(1000px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.avatar-preview {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  background: #0d1117;
+}
+
+.avatar-preview--empty {
+  background:
+    linear-gradient(135deg, rgba(139, 148, 158, 0.14), rgba(139, 148, 158, 0.05));
+}
+
+.user-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 44px 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: #0d1117;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.user-input-wrap {
+  position: relative;
+  width: min(420px, calc(100vw - 180px));
+}
+
+.user-check {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6e7681;
+  transform: translateY(-50%);
+}
+
+.user-check--valid {
+  color: #39d353;
+}
+
+.user-check__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.user-check__icon--spinner {
+  animation: spin 900ms linear infinite;
+}
+
+.color-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  height: 32px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.color-picker__label {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.color-picker__select {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(13, 17, 23, 0.88);
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.color-picker__input {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.color-picker__input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker__input::-webkit-color-swatch {
+  border: 1px solid rgba(240, 246, 252, 0.14);
+  border-radius: 999px;
+}
+
+.graph-stack {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b949e;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.github-link:hover {
+  color: #c9d1d9;
+  transform: translateY(-1px);
+}
+
+.github-link svg {
+  width: 22px;
+  height: 22px;
+}
+
+.github-link--inline {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.official-graph-solo {
+  min-height: var(--graph-card-height);
+  padding: 12px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.official-graph-solo h2,
+.official-graph-solo .f6,
+.official-graph-solo .float-right,
+.official-graph-solo .contrib-footer,
+.official-graph-solo .sr-only,
+.official-graph-solo .ContributionCalendar-label span.sr-only {
+  display: none !important;
+}
+
+.official-graph-solo .border,
+.official-graph-solo .ContributionCalendar,
+.official-graph-solo .ContributionCalendar-grid {
+  border: none !important;
+  color: #c9d1d9 !important;
+  background: transparent !important;
+}
+
+.official-graph-solo .ContributionCalendar-grid {
+  margin: 0 auto;
+  border-collapse: separate !important;
+  border-spacing: 3px !important;
+  table-layout: fixed;
+}
+
+.official-graph-solo thead td,
+.official-graph-solo tbody td {
+  padding: 0;
+}
+
+.official-graph-solo .ContributionCalendar-label {
+  position: relative;
+  font-size: 12px;
+  color: #8b949e !important;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.official-graph-solo .ContributionCalendar-label span[aria-hidden="true"] {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0;
+  display: block;
+  font-size: 12px;
+  line-height: 1;
+  color: #8b949e !important;
+}
+
+.official-graph-solo tbody .ContributionCalendar-label {
+  width: 28px;
+  font-size: 12px;
+  color: #8b949e !important;
+}
+
+.official-graph-solo tbody tr:nth-child(1) .ContributionCalendar-label span[aria-hidden="true"],
+.official-graph-solo tbody tr:nth-child(3) .ContributionCalendar-label span[aria-hidden="true"],
+.official-graph-solo tbody tr:nth-child(5) .ContributionCalendar-label span[aria-hidden="true"] {
+  visibility: visible;
+}
+
+.official-graph-solo tbody tr:nth-child(2) .ContributionCalendar-label span[aria-hidden="true"],
+.official-graph-solo tbody tr:nth-child(4) .ContributionCalendar-label span[aria-hidden="true"],
+.official-graph-solo tbody tr:nth-child(6) .ContributionCalendar-label span[aria-hidden="true"],
+.official-graph-solo tbody tr:nth-child(7) .ContributionCalendar-label span[aria-hidden="true"] {
+  visibility: hidden;
+}
+
+.official-graph-solo tbody .ContributionCalendar-label span[aria-hidden="true"] {
+  position: static !important;
+  display: block;
+  clip-path: none !important;
+  font-size: 12px;
+  line-height: 10px;
+}
+
+.official-graph-solo .ContributionCalendar-day {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
+  border-radius: 2px;
+  background: #21262d;
+  box-shadow: inset 0 0 0 1px rgba(13, 17, 23, 0.24);
+}
+
+.official-graph-solo .ContributionCalendar-day[data-level="0"] {
+  background: #21262d;
+}
+
+.official-graph-solo .ContributionCalendar-day[data-level="1"] {
+  background: #0e4429;
+}
+
+.official-graph-solo .ContributionCalendar-day[data-level="2"] {
+  background: #006d32;
+}
+
+.official-graph-solo .ContributionCalendar-day[data-level="3"] {
+  background: #26a641;
+}
+
+.official-graph-solo .ContributionCalendar-day[data-level="4"] {
+  background: #39d353;
+}
+
+.official-graph-solo text,
+.official-graph-solo span,
+.official-graph-solo td,
+.official-graph-solo th,
+.official-graph-solo div {
+  color: #c9d1d9;
+}
+
+.graph-card {
+  position: relative;
+  min-height: var(--graph-card-height);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.graph-card__copy {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  min-width: 72px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(13, 17, 23, 0.88);
+  color: var(--text);
+}
+
+.graph-card__controls {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.copy-burst {
+  position: absolute;
+  top: 28px;
+  right: 46px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.copy-burst__particle {
+  --angle: calc(var(--particle-index) * 36deg);
+  --distance: 30px;
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 999px;
+  background: hsl(calc(110 + var(--particle-index) * 10), 72%, 60%);
+  box-shadow: 0 0 10px rgba(57, 211, 83, 0.35);
+  animation: copy-burst-pop 820ms cubic-bezier(0.18, 0.84, 0.32, 1) forwards;
+}
+
+.graph-skeleton {
+  position: relative;
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+}
+
+.graph-skeleton--with-label {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.graph-skeleton__label {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.graph-skeleton--official {
+  width: 100%;
+  min-height: var(--graph-card-height);
+}
+
+.graph-skeleton--custom {
+  width: 100%;
+  min-height: var(--graph-card-height);
+  border: none;
+  border-radius: 0;
+}
+
+.graph-card__header {
+  padding: 14px 16px 0;
+}
+
+.graph-card__header--split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.graph-card__header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.graph-card__header p {
+  margin: 6px 0 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.status-banner {
+  width: min(1000px, 100%);
+  margin: 0 0 12px;
+  color: #ffb4a1;
+}
+
 .notes-panel {
   width: 100%;
   max-width: 1000px;
@@ -180,8 +551,7 @@ button:hover {
 
 @media (max-width: 860px) {
   .app-shell {
-    padding-left: 10px;
-    padding-right: 10px;
+    width: min(100vw - 20px, 1000px);
   }
 
   .viewport {
@@ -190,5 +560,36 @@ button:hover {
 
   .notes-panel {
     grid-template-columns: 1fr;
+  }
+
+  .user-picker {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes copy-burst-pop {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateX(0) scale(0.2);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateX(var(--distance)) scale(1);
   }
 }

@@ -1,29 +1,300 @@
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { HorseSvgScene } from "./components/HorseSvgScene";
 
+interface ContributionDay {
+  contributionCount: number;
+  date: string;
+  color: string;
+  weekday: number;
+}
+
+interface ContributionDataset {
+  login: string;
+  totalContributions: number;
+  startedAt: string | null;
+  endedAt: string | null;
+  generatedAt: string;
+  days: ContributionDay[];
+}
+
+function contributionJsonUrl(username: string): string {
+  return `${import.meta.env.BASE_URL}data/${username}-contributions.json`;
+}
+
+function officialHtmlUrl(username: string): string {
+  return `${import.meta.env.BASE_URL}data/${username}-official-contributions.html`;
+}
+
+function avatarUrl(username: string): string {
+  return `https://github.com/${username}.png?size=128`;
+}
+
+function githubUserApiUrl(username: string): string {
+  return `https://api.github.com/users/${username}`;
+}
+
+function extractOfficialGraphHtml(html: string): string {
+  const document = new DOMParser().parseFromString(html, "text/html");
+  const graphRoot = document.querySelector(".js-yearly-contributions .border.py-2.graph-before-activity-overview");
+  return graphRoot?.outerHTML ?? "";
+}
+
+function particleStyle(index: number): CSSProperties {
+  return { ["--particle-index" as string]: index };
+}
+
+const HORSE_COLOR_OPTIONS = [
+  { label: "Red", value: "#ef4444" },
+  { label: "Orange", value: "#f97316" },
+  { label: "Gold", value: "#f5d300" },
+  { label: "Green", value: "#39d353" },
+  { label: "Teal", value: "#14b8a6" },
+  { label: "Blue", value: "#3b82f6" },
+  { label: "Purple", value: "#8b5cf6" },
+  { label: "Pink", value: "#ec4899" },
+  { label: "White", value: "#f3f4f6" },
+  { label: "Black", value: "#111827" },
+];
+
 function App() {
+  const [inputValue, setInputValue] = useState("");
+  const [activeUser, setActiveUser] = useState("");
+  const [dataset, setDataset] = useState<ContributionDataset | null>(null);
+  const [officialGraphHtml, setOfficialGraphHtml] = useState("");
+  const [isPaused, setIsPaused] = useState(false);
+  const [sceneKey, setSceneKey] = useState(0);
+  const [isUserValid, setIsUserValid] = useState(false);
+  const [isCheckingUser, setIsCheckingUser] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState("Copy");
+  const [showCopyBurst, setShowCopyBurst] = useState(false);
+  const [horseColor, setHorseColor] = useState("#ef4444");
+
+  useEffect(() => {
+    const normalized = inputValue.trim().toLowerCase();
+    if (!normalized) {
+      setIsCheckingUser(false);
+      setIsUserValid(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setIsCheckingUser(true);
+
+      try {
+        const response = await fetch(githubUserApiUrl(normalized), {
+          signal: controller.signal,
+          headers: {
+            Accept: "application/vnd.github+json",
+          },
+        });
+
+        if (!controller.signal.aborted) {
+          setIsUserValid(response.ok);
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setIsUserValid(false);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsCheckingUser(false);
+        }
+      }
+    }, 350);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [inputValue]);
+
+  useEffect(() => {
+    if (!activeUser) {
+      setDataset(null);
+      setOfficialGraphHtml("");
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadUser(username: string) {
+      try {
+        const [jsonResponse, htmlResponse] = await Promise.all([
+          fetch(contributionJsonUrl(username), { cache: "no-store" }),
+          fetch(officialHtmlUrl(username), { cache: "no-store" }),
+        ]);
+
+        if (!jsonResponse.ok) {
+          throw new Error(`No pre-generated contribution data found for ${username}`);
+        }
+
+        const json = (await jsonResponse.json()) as ContributionDataset;
+        const officialHtml = htmlResponse.ok ? extractOfficialGraphHtml(await htmlResponse.text()) : "";
+
+        if (!cancelled) {
+          setDataset(json);
+          setOfficialGraphHtml(officialHtml);
+        }
+      } catch {
+        if (!cancelled) {
+          setDataset(null);
+          setOfficialGraphHtml("");
+        }
+      }
+    }
+
+    void loadUser(activeUser);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeUser]);
+
+  const liveAvatar = useMemo(() => (inputValue.trim() ? avatarUrl(inputValue.trim()) : ""), [inputValue]);
+  const validationStateClass = isUserValid ? "user-check user-check--valid" : "user-check";
+  const selectedHorseColor = HORSE_COLOR_OPTIONS.some((option) => option.value === horseColor) ? horseColor : "custom";
+
+  const handleConfirm = () => {
+    const normalized = inputValue.trim().toLowerCase();
+    if (!normalized || !isUserValid) {
+      return;
+    }
+
+    setIsPaused(false);
+    setSceneKey((current) => current + 1);
+    setActiveUser(normalized);
+  };
+
+  const handleCopy = async () => {
+    setShowCopyBurst(false);
+    window.setTimeout(() => setShowCopyBurst(true), 0);
+    window.setTimeout(() => setShowCopyBurst(false), 900);
+
+    try {
+      await navigator.clipboard.writeText("Horse contribution graph copy placeholder");
+      setCopyFeedback("Copied");
+      window.setTimeout(() => setCopyFeedback("Copy"), 1200);
+    } catch {
+      setCopyFeedback("Copy failed");
+      window.setTimeout(() => setCopyFeedback("Copy"), 1200);
+    }
+  };
+
   return (
-    <main className="app-shell">
-      <header className="header">
-        <h1>2026 Year of the Horse</h1>
-        <p>kangchainx 真实 GitHub 贡献热力带</p>
-      </header>
+    <main className="app-shell app-shell--compact">
+      <section className="topbar">
+        <div className="user-picker">
+          {liveAvatar ? (
+            <img className="avatar-preview" src={liveAvatar} alt={`${inputValue} avatar`} />
+          ) : (
+            <div className="avatar-preview avatar-preview--empty" />
+          )}
+          <div className="user-input-wrap">
+            <input
+              className="user-input"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              placeholder="Enter GitHub username"
+            />
+            <span className={validationStateClass} aria-hidden="true">
+              {isCheckingUser ? (
+                <svg viewBox="0 0 16 16" className="user-check__icon user-check__icon--spinner">
+                  <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="10 8" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 16 16" className="user-check__icon">
+                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </span>
+          </div>
+          <button type="button" onClick={handleConfirm}>
+            Load
+          </button>
+          <a
+            className="github-link github-link--inline"
+            href="https://github.com/kangchainx/horse-ucg"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open horse-ucg on GitHub"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.5 7.5 0 0 1 8 3.8c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+              />
+            </svg>
+          </a>
+        </div>
+      </section>
 
-      <HorseSvgScene />
+      <section className="graph-stack">
+        {officialGraphHtml ? (
+          <section
+            className="official-graph-solo"
+            dangerouslySetInnerHTML={{ __html: officialGraphHtml }}
+          />
+        ) : (
+          <section className="graph-skeleton graph-skeleton--official graph-skeleton--with-label">
+            <p className="graph-skeleton__label">Enter a username to fetch the GitHub contribution graph.</p>
+          </section>
+        )}
 
-      <section className="notes-panel">
-        <article>
-          <h2>这次改动</h2>
-          <p>页面现在默认读取 kangchainx 的真实 GitHub contribution calendar，不再使用随机 mock 数据充当热力带。</p>
-        </article>
-        <article>
-          <h2>接入方式</h2>
-          <p>构建前通过 GitHub GraphQL 抓取贡献日历并写入本地 JSON，前端静态页再读取这份数据，因此适合 GitHub Pages。</p>
-        </article>
-        <article>
-          <h2>后续方向</h2>
-          <p>下一步可以把用户名做成可配置项，或者在 GitHub Actions 里定时刷新 JSON，这样页面会自动跟随真实贡献变化。</p>
+        <article className="graph-card">
+          {dataset ? (
+            <>
+              <button type="button" className="graph-card__copy" onClick={handleCopy}>
+                {copyFeedback}
+              </button>
+              {showCopyBurst ? (
+                <div className="copy-burst" aria-hidden="true">
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <span
+                      key={index}
+                      className="copy-burst__particle"
+                      style={particleStyle(index)}
+                    />
+                  ))}
+                </div>
+              ) : null}
+              <HorseSvgScene dataset={dataset} isPaused={isPaused} sceneKey={sceneKey} horseColor={horseColor} />
+              <div className="graph-card__controls">
+                <label className="color-picker" aria-label="Horse color">
+                  <span className="color-picker__label">Horse color</span>
+                  <select
+                    className="color-picker__select"
+                    value={selectedHorseColor}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      if (nextValue !== "custom") {
+                        setHorseColor(nextValue);
+                      }
+                    }}
+                  >
+                    {HORSE_COLOR_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                    <option value="custom">Custom</option>
+                  </select>
+                  <input
+                    className="color-picker__input"
+                    type="color"
+                    value={horseColor}
+                    onChange={(event) => setHorseColor(event.target.value)}
+                  />
+                </label>
+              </div>
+            </>
+          ) : (
+            <section className="graph-skeleton graph-skeleton--custom graph-skeleton--with-label">
+              <p className="graph-skeleton__label">Enter a username to generate your Year of the Horse contribution graph.</p>
+            </section>
+          )}
         </article>
       </section>
+
     </main>
   );
 }
