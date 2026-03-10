@@ -43,22 +43,45 @@ function particleStyle(index: number): CSSProperties {
   return { ["--particle-index" as string]: index };
 }
 
+function dynamicShareImageUrl(username: string, color: string): string {
+  const baseOrigin = (import.meta.env.VITE_SHARE_IMAGE_ORIGIN || window.location.origin).replace(/\/$/, "");
+  const url = new URL(`${baseOrigin}/api/share-card`);
+  url.searchParams.set("user", username.toLowerCase());
+  url.searchParams.set("color", color.replace("#", "").toLowerCase());
+  return url.toString();
+}
+
 const HORSE_COLOR_OPTIONS = [
-  { label: "Red", value: "#ef4444" },
-  { label: "Orange", value: "#f97316" },
-  { label: "Gold", value: "#f5d300" },
-  { label: "Green", value: "#39d353" },
-  { label: "Teal", value: "#14b8a6" },
-  { label: "Blue", value: "#3b82f6" },
-  { label: "Purple", value: "#8b5cf6" },
-  { label: "Pink", value: "#ec4899" },
-  { label: "White", value: "#f3f4f6" },
-  { label: "Black", value: "#111827" },
+  { label: "Red", slug: "red", value: "#ef4444" },
+  { label: "Orange", slug: "orange", value: "#f97316" },
+  { label: "Gold", slug: "gold", value: "#f5d300" },
+  { label: "Green", slug: "green", value: "#39d353" },
+  { label: "Teal", slug: "teal", value: "#14b8a6" },
+  { label: "Blue", slug: "blue", value: "#3b82f6" },
+  { label: "Purple", slug: "purple", value: "#8b5cf6" },
+  { label: "Pink", slug: "pink", value: "#ec4899" },
+  { label: "White", slug: "white", value: "#f3f4f6" },
+  { label: "Black", slug: "black", value: "#111827" },
 ];
 
+function readInitialState() {
+  const params = new URLSearchParams(window.location.search);
+  const initialUser = params.get("user")?.trim().toLowerCase() ?? "";
+  const initialColor = params.get("color")?.trim() ?? "";
+  const normalizedColor = /^#?[0-9a-fA-F]{6}$/.test(initialColor)
+    ? (initialColor.startsWith("#") ? initialColor : `#${initialColor}`).toLowerCase()
+    : "#ef4444";
+
+  return {
+    initialUser,
+    initialColor: normalizedColor,
+  };
+}
+
 function App() {
-  const [inputValue, setInputValue] = useState("");
-  const [activeUser, setActiveUser] = useState("");
+  const [{ initialUser, initialColor }] = useState(readInitialState);
+  const [inputValue, setInputValue] = useState(initialUser);
+  const [activeUser, setActiveUser] = useState(initialUser);
   const [dataset, setDataset] = useState<ContributionDataset | null>(null);
   const [officialGraphHtml, setOfficialGraphHtml] = useState("");
   const [isPaused, setIsPaused] = useState(false);
@@ -67,7 +90,7 @@ function App() {
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState("Copy");
   const [showCopyBurst, setShowCopyBurst] = useState(false);
-  const [horseColor, setHorseColor] = useState("#ef4444");
+  const [horseColor, setHorseColor] = useState(initialColor);
 
   useEffect(() => {
     const normalized = inputValue.trim().toLowerCase();
@@ -150,9 +173,26 @@ function App() {
     };
   }, [activeUser]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (activeUser) {
+      params.set("user", activeUser);
+      params.set("color", horseColor.replace("#", ""));
+    } else {
+      params.delete("user");
+      params.delete("color");
+    }
+
+    const nextQuery = params.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}`;
+    window.history.replaceState({}, "", nextUrl);
+  }, [activeUser, horseColor]);
+
   const liveAvatar = useMemo(() => (inputValue.trim() ? avatarUrl(inputValue.trim()) : ""), [inputValue]);
   const validationStateClass = isUserValid ? "user-check user-check--valid" : "user-check";
-  const selectedHorseColor = HORSE_COLOR_OPTIONS.some((option) => option.value === horseColor) ? horseColor : "custom";
+  const normalizedHorseColor = horseColor.toLowerCase();
+  const selectedHorseColor = HORSE_COLOR_OPTIONS.some((option) => option.value === normalizedHorseColor) ? normalizedHorseColor : "custom";
 
   const handleConfirm = () => {
     const normalized = inputValue.trim().toLowerCase();
@@ -171,8 +211,13 @@ function App() {
     window.setTimeout(() => setShowCopyBurst(false), 900);
 
     try {
-      await navigator.clipboard.writeText("Horse contribution graph copy placeholder");
-      setCopyFeedback("Copied");
+      if (!dataset) {
+        return;
+      }
+
+      const shareText = `![${dataset.login} Year of the Horse contribution graph](${dynamicShareImageUrl(dataset.login, normalizedHorseColor)})`;
+      await navigator.clipboard.writeText(shareText);
+      setCopyFeedback("Copied image");
       window.setTimeout(() => setCopyFeedback("Copy"), 1200);
     } catch {
       setCopyFeedback("Copy failed");
