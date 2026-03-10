@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Derived from horse-face-light-svgrepo-com-empty.svg -->
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(800 0) scale(-1 1)">
+        <g class="state-1">
+            <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.49;0.5;0.99;1" dur="0.4s" repeatCount="indefinite" calcMode="discrete" />
+            <path id="path1" fill="#d9d2a7" stroke="none" d="M 0 0 L 200 0 L 200 50 L 250 50 L 250 100 L 300 100 L 300 300 L 400 300 L 400 350 L 450 350 L 450 300 L 650 300 L 650 350 L 700 350 L 700 400 L 650 400 L 650 750 L 600 750 L 600 500 L 550 500 L 550 700 L 500 700 L 500 500 L 450 500 L 450 450 L 300 450 L 300 500 L 200 500 L 200 750 L 150 750 L 150 550 L 100 550 L 100 500 L 50 500 L 50 450 L 100 450 L 100 350 L 150 350 L 150 200 L 100 200 L 100 250 L 0 250 L 0 150 L 50 150 L 50 50 L 0 50 Z"/>
+            <path id="path2" fill="#ffffff" stroke="none" visibility="hidden" d="M 200 0 L 800 0 L 800 800 L 600 800 L 600 750 L 650 750 L 650 400 L 700 400 L 700 350 L 650 350 L 650 300 L 450 300 L 450 350 L 400 350 L 400 300 L 300 300 L 300 100 L 250 100 L 250 50 L 200 50 Z"/>
+            <path id="path3" fill="#ffffff" stroke="none" visibility="hidden" d="M 0 50 L 50 50 L 50 150 L 0 150 Z"/>
+            <path id="path4" fill="#ffffff" stroke="none" visibility="hidden" d="M 100 100 L 150 100 L 150 150 L 100 150 Z"/>
+            <path id="path5" fill="#ffffff" stroke="none" visibility="hidden" d="M 100 200 L 150 200 L 150 350 L 100 350 L 100 450 L 50 450 L 50 500 L 0 500 L 0 250 L 100 250 Z"/>
+            <path id="path6" fill="#d9d2a7" stroke="none" d="M 700 400 L 750 400 L 750 700 L 700 700 Z"/>
+            <path id="path7" fill="#ffffff" stroke="none" visibility="hidden" d="M 300 450 L 450 450 L 450 500 L 500 500 L 500 700 L 450 700 L 450 750 L 500 750 L 500 700 L 550 700 L 550 500 L 600 500 L 600 750 L 550 750 L 550 800 L 150 800 L 150 750 L 200 750 L 200 500 L 300 500 Z"/>
+            <path id="path8" fill="#d9d2a7" stroke="none" d="M 0 500 L 50 500 L 50 600 L 0 600 Z"/>
+            <path id="path9" fill="#ffffff" stroke="none" visibility="hidden" d="M 50 500 L 100 500 L 100 550 L 150 550 L 150 750 L 100 750 L 100 800 L 0 800 L 0 600 L 50 600 Z"/>
+            <g id="g1">
+                <path id="path10" fill="#d9d2a7" stroke="none" d="M 50 600 L 100 600 L 100 700 L 50 700 Z"/>
+                <path id="path11" fill="#d9d2a7" stroke="none" d="M 450 700 L 500 700 L 500 750 L 450 750 Z"/>
+                <path id="path12" fill="#d9d2a7" stroke="none" d="M 100 750 L 150 750 L 150 800 L 100 800 Z"/>
+                <path id="path13" fill="#d9d2a7" stroke="none" d="M 550 750 L 600 750 L 600 800 L 550 800 Z"/>
+            </g>
+        </g>
+        <g class="state-2" opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.49;0.5;0.99;1" dur="0.4s" repeatCount="indefinite" calcMode="discrete" />
+            <path id="path1-2" fill="#d9d2a7" stroke="none" d="M 0 0 L 200 0 L 200 50 L 250 50 L 250 100 L 300 100 L 300 300 L 400 300 L 400 350 L 450 350 L 450 300 L 650 300 L 650 350 L 700 350 L 700 400 L 650 400 L 650 500 L 600 500 L 600 750 L 550 750 L 550 500 L 450 500 L 450 450 L 300 450 L 300 500 L 150 500 L 150 750 L 100 750 L 100 550 L 50 550 L 50 500 L 50 450 L 100 450 L 100 350 L 150 350 L 150 200 L 100 200 L 100 250 L 0 250 L 0 150 L 50 150 L 50 50 L 0 50 Z"/>
+            <path id="path2-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 200 0 L 800 0 L 800 800 L 600 800 L 600 750 L 650 750 L 650 400 L 700 400 L 700 350 L 650 350 L 650 300 L 450 300 L 450 350 L 400 350 L 400 300 L 300 300 L 300 100 L 250 100 L 250 50 L 200 50 Z"/>
+            <path id="path3-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 0 50 L 50 50 L 50 150 L 0 150 Z"/>
+            <path id="path4-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 100 100 L 150 100 L 150 150 L 100 150 Z"/>
+            <path id="path5-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 100 200 L 150 200 L 150 350 L 100 350 L 100 450 L 50 450 L 50 500 L 0 500 L 0 250 L 100 250 Z"/>
+            <path id="path6-2" fill="#d9d2a7" stroke="none" d="M 700 400 L 750 400 L 750 700 L 700 700 Z"/>
+            <path id="path7-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 300 450 L 450 450 L 450 500 L 500 500 L 500 700 L 450 700 L 450 750 L 500 750 L 500 700 L 550 700 L 550 500 L 600 500 L 600 750 L 550 750 L 550 800 L 150 800 L 150 750 L 200 750 L 200 500 L 300 500 Z"/>
+            <path id="path8-2" fill="#d9d2a7" stroke="none" d="M 50 500 L 100 500 L 100 600 L 50 600 Z"/>
+            <path id="path9-2" fill="#ffffff" stroke="none" visibility="hidden" d="M 50 500 L 100 500 L 100 550 L 150 550 L 150 750 L 100 750 L 100 800 L 0 800 L 0 600 L 50 600 Z"/>
+            <g id="g1-2">
+                <path id="path10-2" fill="#d9d2a7" stroke="none" d="M 100 600 L 150 600 L 150 700 L 100 700 Z"/>
+                <path id="path11-2" fill="#d9d2a7" stroke="none" d="M 500 700 L 550 700 L 550 750 L 500 750 Z"/>
+                <path id="path12-2" fill="#d9d2a7" stroke="none" d="M 50 750 L 100 750 L 100 800 L 50 800 Z"/>
+                <path id="path13-2" fill="#d9d2a7" stroke="none" d="M 500 750 L 550 750 L 550 800 L 500 800 Z"/>
+            </g>
+        </g>
+    </g>
+</svg>
