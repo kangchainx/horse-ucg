@@ -238,7 +238,9 @@ function App() {
         return;
       }
 
-      const shareText = `![${dataset.login} Year of the Horse contribution graph](${dynamicShareImageUrl(dataset.login, normalizedHorseColor)})`;
+      const imageUrl = dynamicShareImageUrl(dataset.login, normalizedHorseColor);
+      const targetUrl = "https://github.com/kangchainx/horse-ucg";
+      const shareText = `[![${dataset.login} Year of the Horse contribution graph](${imageUrl})](${targetUrl})`;
       await navigator.clipboard.writeText(shareText);
       setCopyFeedback("Copied image");
       window.setTimeout(() => setCopyFeedback("Copy"), 1200);
