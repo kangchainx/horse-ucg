@@ -22,14 +22,37 @@ npm run dev
 npm run build
 ```
 
-## GitHub Pages
+## Vercel deployment
 
-The project is configured with `base: "/horse-ucg/"` in `vite.config.ts`, which matches a repository named `horse-ucg`.
+This project is intended to be deployed as a single Vercel app:
 
-Deploy the built site with:
+- the frontend is served by Vite
+- the dynamic share image is served by `api/share-card.js`
+
+### Required environment variables
+
+- `GITHUB_TOKEN`
+  - a GitHub token that can call the GraphQL API
+  - used by the build step and the dynamic share card endpoint
+
+### Recommended Vercel settings
+
+- Framework Preset: `Vite`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+If you deploy the frontend and API from the same Vercel project, no extra frontend env vars are required.
+
+### Optional base path override
+
+By default the app uses `/` as the Vite base path, which is correct for Vercel.
+
+If you ever need to deploy under a subpath, set:
+
+- `VITE_BASE_PATH`
+
+Example:
 
 ```bash
-npm run deploy
+VITE_BASE_PATH=/horse-ucg/
 ```
-
-If your repository name changes, update the `base` field in `vite.config.ts`.
