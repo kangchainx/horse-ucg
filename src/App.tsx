@@ -17,12 +17,11 @@ interface ContributionDataset {
   days: ContributionDay[];
 }
 
-function contributionJsonUrl(username: string): string {
-  return `${import.meta.env.BASE_URL}data/${username}-contributions.json`;
-}
-
-function officialHtmlUrl(username: string): string {
-  return `${import.meta.env.BASE_URL}data/${username}-official-contributions.html`;
+function contributionsApiUrl(username: string): string {
+  const baseOrigin = (import.meta.env.VITE_SHARE_IMAGE_ORIGIN || window.location.origin).replace(/\/$/, "");
+  const url = new URL(`${baseOrigin}/api/contributions`);
+  url.searchParams.set("user", username.toLowerCase());
+  return url.toString();
 }
 
 function avatarUrl(username: string): string {
@@ -41,6 +40,16 @@ function extractOfficialGraphHtml(html: string): string {
 
 function particleStyle(index: number): CSSProperties {
   return { ["--particle-index" as string]: index };
+}
+
+function MiniHorseIcon() {
+  return (
+    <svg className="mini-horse-icon" viewBox="0 0 64 64" aria-hidden="true">
+      <g transform="translate(64 0) scale(-1 1)">
+        <path fill="currentColor" d="M 0 0 L 16 0 L 16 4 L 20 4 L 20 8 L 24 8 L 24 24 L 32 24 L 32 28 L 36 28 L 36 24 L 52 24 L 52 28 L 56 28 L 56 32 L 52 32 L 52 60 L 48 60 L 48 40 L 44 40 L 44 56 L 40 56 L 40 40 L 36 40 L 36 36 L 24 36 L 24 40 L 16 40 L 16 60 L 12 60 L 12 44 L 8 44 L 8 40 L 4 40 L 4 36 L 8 36 L 8 28 L 12 28 L 12 16 L 8 16 L 8 20 L 0 20 L 0 12 L 4 12 L 4 4 L 0 4 Z" />
+      </g>
+    </svg>
+  );
 }
 
 function dynamicShareImageUrl(username: string, color: string): string {
@@ -91,6 +100,7 @@ function App() {
   const [copyFeedback, setCopyFeedback] = useState("Copy");
   const [showCopyBurst, setShowCopyBurst] = useState(false);
   const [horseColor, setHorseColor] = useState(initialColor);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     const normalized = inputValue.trim().toLowerCase();
@@ -136,34 +146,47 @@ function App() {
     if (!activeUser) {
       setDataset(null);
       setOfficialGraphHtml("");
+      setLoadError("");
       return;
     }
 
     let cancelled = false;
 
     async function loadUser(username: string) {
-      try {
-        const [jsonResponse, htmlResponse] = await Promise.all([
-          fetch(contributionJsonUrl(username), { cache: "no-store" }),
-          fetch(officialHtmlUrl(username), { cache: "no-store" }),
-        ]);
+      if (!cancelled) {
+        setLoadError("");
+      }
 
-        if (!jsonResponse.ok) {
-          throw new Error(`No pre-generated contribution data found for ${username}`);
+      try {
+        const response = await fetch(contributionsApiUrl(username), { cache: "no-store" });
+
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(payload?.error || `Failed to load contribution data for ${username}`);
         }
 
-        const json = (await jsonResponse.json()) as ContributionDataset;
-        const officialHtml = htmlResponse.ok ? extractOfficialGraphHtml(await htmlResponse.text()) : "";
+        const payload = (await response.json()) as {
+          dataset?: ContributionDataset;
+          officialHtml?: string;
+        };
+
+        if (!payload.dataset) {
+          throw new Error(`No contribution data returned for ${username}`);
+        }
 
         if (!cancelled) {
-          setDataset(json);
-          setOfficialGraphHtml(officialHtml);
+          setDataset(payload.dataset);
+          setOfficialGraphHtml(payload.officialHtml ? extractOfficialGraphHtml(payload.officialHtml) : "");
+          setLoadError("");
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
           setDataset(null);
           setOfficialGraphHtml("");
+          setLoadError(error instanceof Error ? error.message : "Failed to load contributions");
         }
+      } finally {
+        // no-op: loading state is intentionally silent
       }
     }
 
@@ -196,7 +219,7 @@ function App() {
 
   const handleConfirm = () => {
     const normalized = inputValue.trim().toLowerCase();
-    if (!normalized || !isUserValid) {
+    if (!normalized || isCheckingUser) {
       return;
     }
 
@@ -273,6 +296,10 @@ function App() {
         </div>
       </section>
 
+      <p className={`status-banner ${loadError ? "status-banner--error" : "status-banner--idle"}`}>
+        {loadError || "\u00A0"}
+      </p>
+
       <section className="graph-stack">
         {officialGraphHtml ? (
           <section
@@ -281,7 +308,9 @@ function App() {
           />
         ) : (
           <section className="graph-skeleton graph-skeleton--official graph-skeleton--with-label">
-            <p className="graph-skeleton__label">Enter a username to fetch the GitHub contribution graph.</p>
+              <div className="graph-skeleton__label-row">
+                <p className="graph-skeleton__label">Enter a username to fetch the GitHub contribution graph.</p>
+              </div>
           </section>
         )}
 
@@ -334,7 +363,10 @@ function App() {
             </>
           ) : (
             <section className="graph-skeleton graph-skeleton--custom graph-skeleton--with-label">
-              <p className="graph-skeleton__label">Enter a username to generate your Year of the Horse contribution graph.</p>
+              <div className="graph-skeleton__label-row">
+                <p className="graph-skeleton__label">Enter a username to generate your Year of the Horse contribution graph.</p>
+                <MiniHorseIcon />
+              </div>
             </section>
           )}
         </article>
