@@ -12,6 +12,7 @@ A React + TypeScript prototype for a GitHub contribution animation in the spirit
 ## Local development
 
 ```bash
+cp .env.example .env
 npm install
 npm run dev
 ```
