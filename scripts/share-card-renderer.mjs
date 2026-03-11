@@ -155,7 +155,6 @@ export function renderShareCard(dataset, horseColor) {
   </defs>
   <path d="M ${stripOffsetX} ${STRIP_Y - 6} H ${stripOffsetX + renderedWidth}" stroke="url(#horse-glow)" stroke-width="18" />
   <g>
-    <rect x="${stripOffsetX - 1}" y="${STRIP_Y - 1}" width="${renderedWidth + 2}" height="${STRIP_HEIGHT + 2}" fill="none" stroke="#30363d" />
     ${weekRects}
   </g>
   <g>${monthLabels}</g>

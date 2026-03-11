@@ -146,14 +146,6 @@ export function HorseSvgScene({ dataset, isPaused, sceneKey, horseColor }: Horse
       <path d={`M ${stripOffsetX} ${STRIP_Y - 6} H ${stripOffsetX + renderedWidth}`} stroke={`url(#horse-glow-${sceneKey})`} strokeWidth="18" />
 
       <g className="heat-strip">
-        <rect
-          x={stripOffsetX - 1}
-          y={STRIP_Y - 1}
-          width={renderedWidth + 2}
-          height={STRIP_HEIGHT + 2}
-          fill="none"
-          stroke="#30363d"
-        />
         {weeks.map((week, index) => {
           const x = stripOffsetX + slotWidth * index;
           return (
