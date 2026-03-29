@@ -49,5 +49,3 @@ If you deploy the frontend and API from the same Vercel project, no extra fronte
 By default the app uses `/` as the Vite base path, which is correct for Vercel.
 
 If you ever need to deploy under a subpath, set:
-
-- `VITE_BASE_PATH`
