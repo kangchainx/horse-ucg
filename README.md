@@ -41,9 +41,6 @@ This project is intended to be deployed as a single Vercel app:
 - Framework Preset: `Vite`
 - Build Command: `npm run build`
 - Output Directory: `dist`
-
-If you deploy the frontend and API from the same Vercel project, no extra frontend env vars are required.
-
 ### Optional base path override
 
 By default the app uses `/` as the Vite base path, which is correct for Vercel.
