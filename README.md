@@ -44,5 +44,3 @@ This project is intended to be deployed as a single Vercel app:
 ### Optional base path override
 
 By default the app uses `/` as the Vite base path, which is correct for Vercel.
-
-If you ever need to deploy under a subpath, set:
