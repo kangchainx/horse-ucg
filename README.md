@@ -42,5 +42,3 @@ This project is intended to be deployed as a single Vercel app:
 - Build Command: `npm run build`
 - Output Directory: `dist`
 ### Optional base path override
-
-By default the app uses `/` as the Vite base path, which is correct for Vercel.
